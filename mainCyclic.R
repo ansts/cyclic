@@ -454,19 +454,16 @@ clssf_16=lapply(names(Mcs), function(n){
   return(list(max(x[[3]]), nrow(x[[1]]), rownames(x[[1]]),ccmx))
 })
 
-
+# clustering criterion
 clucris=sapply(1:4, function(i){
   cc=clssf_16[[i]][[4]]
   cc[lower.tri(cc)]
 })
 colnames(clucris)=names(Mcs)
+
 X=melt(clucris)
 kruskal.test(X[,3]~X[,2])
 dunn.test::dunn.test(X[,3], g=X[,2])
-
-lmbig=lm(data=X, value~Var2)
-almbig=aov(lmbig)
-TukeyHSD(almbig, method="bh")
 
 ctop=grepl("c_",X$Var2)
 wilcox.test(X$value~ctop)
@@ -479,18 +476,13 @@ anova(lmciso)
 
 wilcox.test(X$value~ctop, subset=!isot)
 
+#### Figure 6 B -----
 boxplot(X$value~X$Var2, xlab="Subgraph", ylab="Sum of clustering criterion", bty="n")
 lines(c(1,4), c(26,26))
 lines(c(2,4), c(25,25))
 legend("bottomleft", "Kruskal-Wallis, p=0.03, Dunn p<0.05", bty="n")
 
-# Using Kruskal-Wallis and Wilcoxon tests, the sum of the clustering criteria
-# for the best classifiers depend on the mostly on
-# isotyope and not on topology. ANOVA does not show interaction between isotype
-# and topology. Although the more sensitive IgG assay has lower performance on
-# cyclic peptides, the difference is not significant (p=0.24)
-
-
+#### Figure 6 A -----
 x=unlist(lapply(clssf_16,function(l) l[[3]]))
 xu=unique(x)
 x1=lapply(clssf_16,function(l) l[[3]])
@@ -499,14 +491,9 @@ colnames(X)=names(Mcs)
 euX=euler(X, , shape="ellipse", control=list(extraopt=T))
 plot(euX, quantities=T, cex=2)
 
-# Among the selected features, those based on c_IgM and l_IgM had the least
-# overlap (8) while those of l_IgG and c_IgG - the most (17) (Jaccard distance 
-# confirms it but the differentces are not significant). The sum of the
-# clustering criterion is highest for c_IgM and lowest for l_IgG.
-
-clssf_16_DM=sapply(clssf_16,function(l1) {           # Jaccard distance
+clssf_16_DM=sapply(clssf_16,function(l1) {           
           sapply(clssf_16, function(l2) {
-              if (all(l1[[3]]==l2[[3]])) {
+              if (all(l1[[3]]==l2[[3]])) { 
                 return(0)
             } else {return((length(union(l1[[3]],l2[[3]])))/(length(intersect(l1[[3]],l2[[3]]))))}
           })
@@ -514,7 +501,8 @@ clssf_16_DM=sapply(clssf_16,function(l1) {           # Jaccard distance
 
 ij=combn(4,2)[,1:3]
 
-clssf_16_ps=apply(ij,2,function(i1) {           # Jaccard distance
+### Jaccard distance ----
+clssf_16_ps=apply(ij,2,function(i1) {           
             i2= (1:4)[!(1:4) %in% i1]
                 print(i2)
             n=c(length(union(clssf_16[[i1[1]]][[3]],clssf_16[[i1[2]]][[3]])),
