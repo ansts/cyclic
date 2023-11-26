@@ -28,7 +28,8 @@ require(chisq.posthoc.test)
 require(alluvial)
 
 # ... from a previous work, using a joint reactivity graph based on 4 sera from
-# patients with AD and 4 sera from patients with FTD compared to pooled human
+# patients witrequire(alluvial)
+h AD and 4 sera from patients with FTD compared to pooled human
 # IgM, an analysis of the cliques determined cliques with significant over/under
 # expression of reactivity in AD/FTD. The actual number of peptides are smaller
 # to get bellow the limit for the PEPPerPRINT 5 field arrays - 130 peptides
@@ -161,12 +162,6 @@ kruskal.test(sizGi, gf)
 #### Figure 4 ----
 dnsGi=sapply(Gi,function(g) graph.density(g))
 kruskal.test(dnsGi, gf)
-gff=gf
-gff=sub("linear","l",gff)
-gff=sub("cyclic","c",gff)
-gff=sub("IgM","M",gff)
-gff=sub("IgG","G",gff)
-dunn.test::dunn.test(dnsGi, gff)
 boxplot(dnsGi~gf, xlab="Topology/Isotype", ylab="Graph density",  par(bty="n"))
 legend("bottomleft", legend="Dunn test p<0.05", bty = "n")
 lines(c(1,3),c(0.382,0.382))
@@ -176,6 +171,7 @@ meanGi=t(aggregate(t(Dn), by=list(prms$Topology,prms$Channel), mean)[,-(1:2)])
 colnames(meanGi)=c("cyclic_IgM","linear_IgM","cyclic_IgG","linear_IgG")
 x=melt(meanGi)
 dunn.test::dunn.test(x$value, g=x$Var2)
+x$Var2=factor(x$Var2, levels=c("cyclic_IgG","cyclic_IgM","linear_IgG","linear_IgM"))
 boxplot(x$value~x$Var2, xlab="Topology/Isotype", ylab="Mean intensity",  par(bty="n"))
 legend("topleft", legend="Dunn test p<0.05/ all differences significant", bty = "n")
 
